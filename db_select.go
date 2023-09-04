@@ -53,17 +53,14 @@ func buildQuery(attrs []string) Query {
 }
 
 func execQuery(db *sql.DB, query Query) []map[string]interface{} {
-	var err error = nil
 	var stmt *sql.Stmt
 	if query.Field != "" && query.Value != "" {
-		stmt, err = db.Prepare("SELECT " + query.Columns + " FROM " + query.Table + " WHERE " + query.Field + " = ? LIMIT 10")
+		stmt = check(db.Prepare("SELECT " + query.Columns + " FROM " + query.Table + " WHERE " + query.Field + " = ? LIMIT 10"))
 	}
-	stmt, err = db.Prepare("SELECT " + query.Columns + " FROM " + query.Table + " LIMIT 10")
-	CheckError(err)
+	stmt = check(db.Prepare("SELECT " + query.Columns + " FROM " + query.Table + " LIMIT 10"))
 	defer stmt.Close()
 
-	rows, err := stmt.Query()
-	CheckError(err)
+	rows := check(stmt.Query())
 	defer rows.Close()
 
 	return scanRowsToMaps(rows)
@@ -127,17 +124,16 @@ func connectDB() *sql.DB {
 		dbname,
 	)
 
-	db, err := sql.Open("postgres", psqlconn)
-	CheckError(err)
-
-	err = db.Ping()
-	CheckError(err)
+	db := check(sql.Open("postgres", psqlconn))
+	check("", db.Ping())
 
 	return db
 }
 
-func CheckError(err error) {
+func check[T any](result T, err error) T {
 	if err != nil {
 		panic(err)
 	}
+
+	return result
 }
