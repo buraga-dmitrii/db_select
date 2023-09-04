@@ -6,9 +6,11 @@ Your DB should be open on localhost:5432
 
 Provide as ENV variables your DB credentials and DB name:
 
+```
 export DB_NAME=db_name
 export DB_USER=user
 export DB_PASSWORD=db_password
+```
 
 ## Usage
 
