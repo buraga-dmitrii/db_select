@@ -12,6 +12,8 @@ export DB_PASSWORD=db_password
 
 ## Usage
 
+```
 db_select clients                   - select * from clients limit 10
 db_select clients "*" id 123        - select * from clients where id = 123 limit 10
 db_select clients "id, name" id 123 - select id,name from clients where id = 123 limit 10
+```
