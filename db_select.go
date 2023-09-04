@@ -53,14 +53,13 @@ func buildQuery(attrs []string) Query {
 }
 
 func execQuery(db *sql.DB, query Query) []map[string]interface{} {
-	var stmt *sql.Stmt
-	if query.Field != "" && query.Value != "" {
-		stmt = check(db.Prepare("SELECT " + query.Columns + " FROM " + query.Table + " WHERE " + query.Field + " = ? LIMIT 10"))
-	}
-	stmt = check(db.Prepare("SELECT " + query.Columns + " FROM " + query.Table + " LIMIT 10"))
-	defer stmt.Close()
+	var rows *sql.Rows
 
-	rows := check(stmt.Query())
+	if query.Field != "" && query.Value != "" {
+		rows = check(db.Query("SELECT "+query.Columns+" FROM "+query.Table+" WHERE "+query.Field+" = $1", query.Value))
+	} else {
+		rows = check(db.Query("SELECT " + query.Columns + " FROM " + query.Table))
+	}
 	defer rows.Close()
 
 	return scanRowsToMaps(rows)
